@@ -135,18 +135,22 @@ def update_user(id):
         "user": user.dict()
     })
 #---------update userby sts----#
-@app.route("/users/<int:id>/status", methods=["PUT"])
+@app.route("/users/<int:id>/status", methods=["GET","PUT"])
 def update_user_status(id):
-
-    data = request.json
 
     user = User.query.get(id)
 
     if not user or user.delete_status:
-        return jsonify({"message": "User not found"}), 404
+        return jsonify({"message": "User not found"})
+
+    if request.method == "GET":
+        return jsonify({
+            "status": user.status
+        })
+
+    data = request.get_json()
 
     user.status = data["status"]
-
     db.session.commit()
 
     return jsonify({
